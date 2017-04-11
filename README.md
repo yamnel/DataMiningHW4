@@ -1,6 +1,7 @@
 # Data Mining
 **Assignment #4**
 
+
 Given a data set containing emails that are either regular email or spam;
 
 1- Use Naïve Bayes to classify each record in the set as either spam or email.
