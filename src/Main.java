@@ -7,42 +7,64 @@ import java.util.Scanner;
 
 
 public class Main {
+    // Arrays of files that hold the trainData & testData.txt names
     static File[] trainingFiles;
-    static HashMap<String, Integer> words = new HashMap();
+    static File[] testingFiles;
+
+    // Dictionary that holds the words in train and test and their count
+    static HashMap<String, Integer> trainWords = new HashMap();
+    static HashMap<String, Integer> testWords = new HashMap();
+
 
     public Main() {
     }
 
     public static void main(String[] args) {
+        // loading the .txt locations
         File trainingFolderPath = new File(System.getProperty("user.dir") + "/trainData");
+        File testingFolderPath = new File(System.getProperty("user.dir") + "/testData");
+
+        // loading the .txt names
         trainingFiles = trainingFolderPath.listFiles();
-        loadData(trainingFiles);
-        System.out.println(words.size());
-        words.keySet().forEach((key) -> System.out.println(key + "->" + words.get(key)));
+        testingFiles = testingFolderPath.listFiles();
+
+
+        // loading the .txt data into the Dictionaries
+        loadData(trainingFiles, trainWords);
+        loadData(testingFiles, testWords);
+
+        // TESTING PRINT
+        System.err.println(trainWords.size());
+        trainWords.keySet().forEach((key) -> System.out.println(key + " -> " + trainWords.get(key)));
+
+        System.err.println("\n\n"+testWords.size());
+        testWords.keySet().forEach((key) -> System.out.println(key + " -> " + testWords.get(key)));
     }
 
-    static void increaseCountOf(String word) {
-        if(words.containsKey(word)) {
-            Integer temp = (Integer)words.get(word);
-            temp = Integer.valueOf(temp.intValue() + 1);
-            words.put(word, temp);
+    // increases count of @word in @dictionary
+    static void increaseCountOf(String word, HashMap<String, Integer> dictionary) {
+        if(dictionary.containsKey(word)) {
+            Integer temp = dictionary.get(word);
+            temp = temp + 1;
+            dictionary.put(word, temp);
         } else {
-            words.put(word, Integer.valueOf(1));
+            dictionary.put(word, 1);
         }
 
     }
 
-    static void loadData(File[] containingFolder) {
-        List<String> fileNames = new ArrayList();
+
+    // loads data from @containingFolders into @dictionary
+    static void loadData(File[] containingFolder, HashMap<String, Integer> dictionary) {
+//        ArrayList fileNames = new ArrayList();  // Testing
         Scanner lineScanr = null;
-        File[] var3 = containingFolder;
-        int var4 = containingFolder.length;
 
-        for(int var5 = 0; var5 < var4; ++var5) {
-            File file = var3[var5];
-            if(file.isFile()) {
-                fileNames.add(file.getName());
 
+        for(int fileNumber = 0; fileNumber < containingFolder.length; ++fileNumber) {
+            File file = containingFolder[fileNumber];
+
+            if(file.isFile()) {  // if the file is valid
+//                fileNames.add(file.getName());  // Testing
                 try {
                     lineScanr = new Scanner(file);
                 } catch (FileNotFoundException var9) {
@@ -54,7 +76,7 @@ public class Main {
 
                     while(wordScanr.hasNext()) {
                         String word = wordScanr.next();
-                        increaseCountOf(word);
+                        increaseCountOf(word, dictionary);
                     }
                 }
             }
