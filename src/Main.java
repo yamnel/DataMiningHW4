@@ -40,6 +40,10 @@ public class Main {
         emailWordFreq = new int[numberOfTrainingEmails][allWords.size() + 1];
         loadWordFreq(trainingFilesList);
 
+        // Testing
+        System.err.printf("There are %d total words!\n\nThere are %d training emails.\n\n", allWords.size(), numberOfTrainingEmails);
+
+
     }
 
 
