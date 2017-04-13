@@ -1,28 +1,32 @@
-import sun.text.resources.iw.FormatData_iw_IL;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Main {
+class DataLoader {
 
     // Arrays of files that hold the trainData & testData.txt names
-    static File[] trainingFilesList;
-    static File[] testingFilesList;
-    static ArrayList<File> fileNames = new ArrayList();
+    private File[] trainingFilesList;
+    private File[] testingFilesList;
+    private ArrayList<File> fileNames = new ArrayList();
 
     // Dictionary that holds the words in train and test and their count
-    static ArrayList<String> allWords = new ArrayList<>();
-    static int[][] emailWordFreq;
-    static int numberOfTrainingEmails;
+    private ArrayList<String> allWords = new ArrayList<>();
+    private int[][] emailWordFreq;
+    private int numberOfTrainingEmails;
 
 
-    public Main() {
+    public ArrayList<String> getAllWords() {
+        return allWords;
     }
 
-    public static void main(String[] args) {
+    public int[][] getEmailWordFreq() {
+        return emailWordFreq;
+    }
+
+    DataLoader() {
+        long startTime = System.nanoTime();
         // loading the .txt locations
         File trainingFolderPath = new File(System.getProperty("user.dir") + "/trainData");
         File testingFolderPath = new File(System.getProperty("user.dir") + "/testData");
@@ -41,16 +45,14 @@ public class Main {
         loadWordFreq(trainingFilesList);
 
         // Testing
-        System.err.printf("There are %d total words!\n\nThere are %d training emails.\n\n", allWords.size(), numberOfTrainingEmails);
-
-
+        System.out.printf("There are %d total words. There are %d training emails.\n", allWords.size(), numberOfTrainingEmails);
+        System.out.printf("Took %d seconds.", (System.nanoTime() - startTime) / 1000000000);
     }
 
-
-    static void loadWordFreq(File[] fileNames) {
+    private void loadWordFreq(File[] fileNames) {
         Scanner lineScanr = null;
 //        for (File file : fileNames) {
-        for(int i = 0; i < fileNames.length;i++){
+        for (int i = 0; i < fileNames.length; i++) {
             try {
                 lineScanr = new Scanner(fileNames[i]); // load the line
             } catch (FileNotFoundException e) {
@@ -67,20 +69,18 @@ public class Main {
                     if (isAlphaNumeric(word)) emailWordFreq[i][index]++;
                 }
             }
-            if(isItSpam(fileNames[i].getName())){
-                emailWordFreq[i][emailWordFreq.length-1] = 1;
+            if (isItSpam(fileNames[i].getName())) {
+                emailWordFreq[i][emailWordFreq.length - 1] = 1;
             }
         }
     }
 
     // loads data from @containingFolders into @dictionary
-    static void parseWords(File[] containingFolder) {
+    private void parseWords(File[] containingFolder) {
         Scanner lineScanr = null;
 
         // go through all .txt files
-        for (int fileNumber = 0; fileNumber < containingFolder.length; fileNumber++) {
-            File file = containingFolder[fileNumber];
-
+        for (File file : containingFolder) {
             if (file.isFile()) {  // if the file is valid
                 fileNames.add(file);
 
@@ -108,11 +108,11 @@ public class Main {
     }
 
 
-    static boolean isItSpam(String filename) {
+    private boolean isItSpam(String filename) {
         return filename.startsWith("sp");
     }
 
-    static boolean isAlphaNumeric(String str) { // checks for alphanumerics on apostrophes
+    private boolean isAlphaNumeric(String str) { // checks for alphanumerics on apostrophes
         return str.matches("^[\\p{Alnum}|']+$");
     }
 
