@@ -26,7 +26,6 @@ public class NaiveBayesTest {
         wordList.add("hello");
         wordList.add("pamela");
 
-        nb = new NaiveBayes(wordCounts, wordList);
     }
 
     @org.junit.After

@@ -11,45 +11,74 @@ class DataLoader {
     private File[] testingFilesList;
     private ArrayList<File> fileNames = new ArrayList();
 
-    // Dictionary that holds the words in train and test and their count
+    // List of all possible words from the given test and training data
     private ArrayList<String> allWords = new ArrayList<>();
-    private int[][] emailWordFreq;
+    /*  Holds the frequency of words per e-mail. The last element stores whether the e-mail is spam (1) or not spam (0)
+        Example Structure:
+        {
+            {0,1,0,4,1},
+            {2,4,1,0,0},
+            {0,0,5,0,0}
+        }
+        Each word is tied to a specific index, which can be found using allWords.indexOf(someWord).
+    */
+    private int[][] trainingData;
+    private int[][] testData;
+
+    // Holds the number of e-mails for each set. Stored in a variable to reduce calls of length method
     private int numberOfTrainingEmails;
-
-
-    public ArrayList<String> getAllWords() {
-        return allWords;
-    }
-
-    public int[][] getEmailWordFreq() {
-        return emailWordFreq;
-    }
+    private int numberofTestEmails;
 
     DataLoader() {
+        // Start clock to time process of loading data
         long startTime = System.nanoTime();
+        System.out.println("Loading data... ");
+
         // loading the .txt locations
         File trainingFolderPath = new File(System.getProperty("user.dir") + "/trainData");
         File testingFolderPath = new File(System.getProperty("user.dir") + "/testData");
 
-        // loading the .txt names
+        // loading the lists of file names for the training and test e-mail files
         trainingFilesList = trainingFolderPath.listFiles();
         numberOfTrainingEmails = trainingFilesList.length;
-
         testingFilesList = testingFolderPath.listFiles();
+        numberofTestEmails = testingFilesList.length;
 
-        // loading the .txt data into the lists
+        // Go through each file in the training and testing list and add the unique words to the list of all words
         parseWords(trainingFilesList);
         parseWords(testingFilesList);
 
-        emailWordFreq = new int[numberOfTrainingEmails][allWords.size() + 1];
-        loadWordFreq(trainingFilesList);
+        // Initialize arrays for each training e-mail holding the counts of each word
+        trainingData = new int[numberOfTrainingEmails][allWords.size() + 1];
+        loadWordFreq(trainingData, trainingFilesList);
 
-        // Testing
-        System.out.printf("There are %d total words. There are %d training emails.\n", allWords.size(), numberOfTrainingEmails);
-        System.out.printf("Took %d seconds.", (System.nanoTime() - startTime) / 1000000000);
+        // Initialize arrays for each test e-mail holding the counts of each word
+        testData = new int[numberofTestEmails][allWords.size() + 1];
+        loadWordFreq(testData, testingFilesList);
+
+
+        // Print process results
+        System.out.printf("Done. Took %d second(s).\n", (System.nanoTime() - startTime) / 1000000000);
+        System.out.printf("There are %d total unique words. There are %d training e-mails and %d test e-mails.\n",
+                allWords.size(),
+                numberOfTrainingEmails,
+                numberofTestEmails);
     }
 
-    private void loadWordFreq(File[] fileNames) {
+
+    ArrayList<String> getAllWords() {
+        return allWords;
+    }
+
+    int[][] getTestData() {
+        return testData;
+    }
+
+    int[][] getTrainingData() {
+        return trainingData;
+    }
+
+    private void loadWordFreq(int[][] wordFreqArray, File[] fileNames) {
         Scanner lineScanr = null;
 //        for (File file : fileNames) {
         for (int i = 0; i < fileNames.length; i++) {
@@ -66,11 +95,13 @@ class DataLoader {
                     String word = wordScanr.next();
 
                     int index = allWords.indexOf(word);
-                    if (isAlphaNumeric(word)) emailWordFreq[i][index]++;
+                    if (isAlphaNumeric(word)) wordFreqArray[i][index]++;
                 }
             }
+
+            // If filename starts with sp then it's spam, and set last element in array to 1 (meaning that e-mail is spam)
             if (isItSpam(fileNames[i].getName())) {
-                emailWordFreq[i][emailWordFreq.length - 1] = 1;
+                wordFreqArray[i][allWords.size()-1] = 1;
             }
         }
     }

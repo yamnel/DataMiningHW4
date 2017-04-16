@@ -9,6 +9,6 @@ public class Runner {
         Runner runner = new Runner();
 
         runner.dataLoader = new DataLoader();
-        runner.naiveBayes = new NaiveBayes(runner.dataLoader.getEmailWordFreq(), runner.dataLoader.getAllWords());
+        runner.naiveBayes = new NaiveBayes(runner.dataLoader);
     }
 }
