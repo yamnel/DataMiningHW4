@@ -14,7 +14,7 @@ class DataLoader {
     private int[][] trainingData;
     private int[][] testingData;
     private int[] spamWordCount;
-    private int[] notspamWordCount;
+    private int[] notSpamWordCount;
     private int numSpamTrainingEmails = 0;
     private int numNotSpamTrainingEmails = 0;
 
@@ -32,7 +32,7 @@ class DataLoader {
 
         // Init arrays holding the number of emails with each word
         spamWordCount = new int[wordList.size()];
-        notspamWordCount = new int[wordList.size()];
+        notSpamWordCount = new int[wordList.size()];
 
         // Generate arrays for each e-mail holding the word count for each word
         trainingData = loadWordCounts(TRAINING_FILES);
@@ -87,7 +87,7 @@ class DataLoader {
                             // and add the word to this email's word list, so it's not counted next time
                             if (!emailWordList.contains(word) && isTrainingFiles) {
                                 if (cls == 0) {
-                                    notspamWordCount[wordIndex]++;
+                                    notSpamWordCount[wordIndex]++;
                                 } else {
                                     spamWordCount[wordIndex]++;
                                 }
@@ -132,7 +132,7 @@ class DataLoader {
     }
 
     int[] getNotSpamWordCount() {
-        return notspamWordCount;
+        return notSpamWordCount;
     }
 
     int getNumSpamTrainingEmails() {
