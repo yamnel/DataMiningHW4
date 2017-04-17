@@ -61,27 +61,29 @@ class DataLoader {
     }
 
     private void loadWordCounts(int[][] dataArray, File[] fileList) {
-        int classIndex = wordList.size()-1;
+        int classIndex = wordList.size() - 1;
         int cls;
-        boolean isTrainingData = dataArray == trainingData;
         for (int index = 0; index < fileList.length; index++) {
             cls = fileList[index].getName().startsWith("sp") ? 1 : 0;
-
+            ArrayList<String> emailWordList = new ArrayList<>();
             try (BufferedReader br = new BufferedReader(new FileReader(fileList[index]))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     for (String word : line.split(" ")) {
                         int wordIndex = wordList.indexOf(word);
-                        // If word not in word list, don't increment that word's counter. This means the word wasn't
+                        // If word not in cls word list, don't increment that word's counter. This means the word wasn't
                         // found during the first scan of the files. This should only happen when this method is called
                         // on the test data since some words in the test data won't be in the training data.
                         if (wordIndex != -1) {
                             // Add one to that word's counter for this e-mail
                             dataArray[index][wordIndex] += 1;
 
+                            // If this word hasn't been encountered in this e-mail before
                             // Add one to the word's counter for this email's class array
-                            if(isTrainingData){
+                            // and add the word to the word list, so it's not counted next time
+                            if (emailWordList.indexOf(word) == -1) {
                                 (cls == 0 ? notspamWordCount : spamWordCount)[wordIndex] += 1;
+                                emailWordList.add(word);
                             }
                         }
                     }
@@ -103,7 +105,7 @@ class DataLoader {
         return testingData;
     }
 
-    ArrayList<String> getWordList(){
+    ArrayList<String> getWordList() {
         return wordList;
     }
 
@@ -111,7 +113,7 @@ class DataLoader {
         return spamWordCount;
     }
 
-    int[] getNotSpamWordCount(){
+    int[] getNotSpamWordCount() {
         return notspamWordCount;
     }
 }
