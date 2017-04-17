@@ -3,17 +3,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class DataLoader {
     private static final String TEST_DATA_PATH = System.getProperty("user.dir") + "/testData";
     private static final String TRAIN_DATA_PATH = System.getProperty("user.dir") + "/trainData";
-    private static final File[] TRAINING_FILES = new File(TEST_DATA_PATH).listFiles();
-    private static final File[] TESTING_FILES = new File(TRAIN_DATA_PATH).listFiles();
+    private static final File[] TRAINING_FILES = new File(TRAIN_DATA_PATH).listFiles();
+    private static final File[] TESTING_FILES = new File(TEST_DATA_PATH).listFiles();
     private ArrayList<String> wordList;
     private int[][] trainingData;
     private int[][] testingData;
     private int[] spamWordCount;
     private int[] notspamWordCount;
+    private int numSpamTrainingEmails = 0;
+    private int numNotSpamTrainingEmails = 0;
 
     DataLoader() {
         // Print process information
@@ -32,10 +35,8 @@ class DataLoader {
         notspamWordCount = new int[wordList.size()];
 
         // Generate arrays for each e-mail holding the word count for each word
-        trainingData = new int[TRAINING_FILES.length][wordList.size() + 1];
-        loadWordCounts(trainingData, TRAINING_FILES);
-        testingData = new int[TESTING_FILES.length][wordList.size() + 1];
-        loadWordCounts(testingData, TESTING_FILES);
+        trainingData = loadWordCounts(TRAINING_FILES);
+        testingData = loadWordCounts(TESTING_FILES);
 
         System.out.printf("done. Took %d seconds.\n", (System.nanoTime() - startTime) / 1000000000);
         System.out.printf("Loaded %d training files and %d test files.\n", TRAINING_FILES.length, TESTING_FILES.length);
@@ -60,9 +61,11 @@ class DataLoader {
         }
     }
 
-    private void loadWordCounts(int[][] dataArray, File[] fileList) {
-        int classIndex = wordList.size() - 1;
+    private int[][] loadWordCounts(File[] fileList) {
+        int[][] dataArray = new int[fileList.length][wordList.size() + 1];
+        int classIndex = wordList.size();
         int cls;
+        boolean isTrainingFiles = Arrays.equals(TRAINING_FILES, fileList);
         for (int index = 0; index < fileList.length; index++) {
             cls = fileList[index].getName().startsWith("sp") ? 1 : 0;
             ArrayList<String> emailWordList = new ArrayList<>();
@@ -73,16 +76,21 @@ class DataLoader {
                         int wordIndex = wordList.indexOf(word);
                         // If word not in cls word list, don't increment that word's counter. This means the word wasn't
                         // found during the first scan of the files. This should only happen when this method is called
-                        // on the test data since some words in the test data won't be in the training data.
-                        if (wordIndex != -1) {
+                        // on the test data since some words in the test data won't be in the training data, unless
+                        // loadWordList is called on the test data
+                        if (wordList.contains(word)) {
                             // Add one to that word's counter for this e-mail
                             dataArray[index][wordIndex] += 1;
 
                             // If this word hasn't been encountered in this e-mail before
-                            // Add one to the word's counter for this email's class array
-                            // and add the word to the word list, so it's not counted next time
-                            if (emailWordList.indexOf(word) == -1) {
-                                (cls == 0 ? notspamWordCount : spamWordCount)[wordIndex] += 1;
+                            // add one to the word's counter for this email's class array
+                            // and add the word to this email's word list, so it's not counted next time
+                            if (!emailWordList.contains(word) && isTrainingFiles) {
+                                if (cls == 0) {
+                                    notspamWordCount[wordIndex]++;
+                                } else {
+                                    spamWordCount[wordIndex]++;
+                                }
                                 emailWordList.add(word);
                             }
                         }
@@ -94,7 +102,17 @@ class DataLoader {
 
             // Set last element in array to 1 if this email is spam (i.e. filename begins with sp)
             dataArray[index][classIndex] = cls;
+
+            // Add one to the total count of e-mails per class
+            if (isTrainingFiles) {
+                if (cls == 0) {
+                    numNotSpamTrainingEmails++;
+                } else {
+                    numSpamTrainingEmails++;
+                }
+            }
         }
+        return dataArray;
     }
 
     int[][] getTrainingData() {
@@ -115,5 +133,13 @@ class DataLoader {
 
     int[] getNotSpamWordCount() {
         return notspamWordCount;
+    }
+
+    int getNumSpamTrainingEmails() {
+        return numSpamTrainingEmails;
+    }
+
+    int getNumNotSpamTrainingEmails() {
+        return numNotSpamTrainingEmails;
     }
 }
