@@ -1,6 +1,3 @@
-/**
- * Created by kohbo on 4/13/2017.
- */
 public class Runner {
     DataLoader dataLoader;
     NaiveBayes naiveBayes;
