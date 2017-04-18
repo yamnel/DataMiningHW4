@@ -55,10 +55,7 @@ class DataLoader {
                     for (String word : line.split(" ")) {
                         // If word not in word list, add it
                         if (!wordList.contains(word)) {
-                            if(filtered){
-                                word = stripSymbols(word);
-                            }
-                            if(word.length() > 0){
+                            if (!filtered || isAlphaNum(word)) {
                                 wordList.add(word);
                             }
                         }
@@ -126,6 +123,10 @@ class DataLoader {
 
     private String stripSymbols(String str){
         return str.replaceAll("\\W", "");
+    }
+
+    private boolean isAlphaNum(String str) {
+        return str.matches("^[\\w]+'?[\\w]*:?$");
     }
 
     int[][] getTrainingData() {
