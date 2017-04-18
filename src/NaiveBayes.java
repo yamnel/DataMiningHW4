@@ -10,11 +10,13 @@ class NaiveBayes {
     private ArrayList<String> wordList;
     private double spamClassProbability;
     private double notSpamClassProbability;
+    private boolean filtered;
 
-    NaiveBayes(DataLoader dl) {
+    NaiveBayes(DataLoader dl, boolean filtered) {
         long startTime = System.nanoTime();
         System.out.print("Initializing Naive-Bayes... ");
 
+        this.filtered = filtered;
         dataLoader = dl;
         trainingData = dl.getTrainingData();
         wordList = dl.getWordList();
@@ -24,12 +26,6 @@ class NaiveBayes {
         p = 1.0 / (double) wordList.size();
         spamClassProbability = mEstimateProbability((double) dataLoader.getNumSpamTrainingEmails(), (double) trainingData.length);
         notSpamClassProbability = mEstimateProbability((double) dataLoader.getNumNotSpamTrainingEmails(), (double) trainingData.length);
-
-//        // TODO Remove
-//        int n = 0;
-//        for (int[] email : dl.getTestingData()) {
-//            System.out.printf("%d, Predicted Class: %d Actual Class: %d\n", n++, getClass(email), email[email.length - 1]);
-//        }
 
         System.out.printf("done. Took %d seconds.\n", (System.nanoTime() - startTime) / 1000000000);
     }
@@ -53,6 +49,15 @@ class NaiveBayes {
                 testData.length,
                 (double) results[0] / (double) results[1] * 100,
                 '%');
+        if(filtered){
+            ArrayList<String> wordListFiltered = new ArrayList<>();
+            for(int index = 0; index < wordList.size(); index++){
+                if(spamWordCount[index] + notSpamWordCount[index] > 50){
+                    wordListFiltered.add(wordList.get(index));
+                }
+            }
+            System.out.printf("With filtering, the word list is reduced to %d words.", wordListFiltered.size());
+        }
         return results;
     }
 
@@ -66,7 +71,7 @@ class NaiveBayes {
         double notSpamProbability = this.notSpamClassProbability;
 
         for (int index = 0; index < email.length - 1; index++) {
-            if (email[index] > 0) {
+            if (email[index] > 0 && ((spamWordCount[index] + notSpamWordCount[index]) > 50 || !filtered)) {
                 spamProbability += mEstimateProbability(spamWordCount[index], dataLoader.getNumSpamTrainingEmails());
                 notSpamProbability += mEstimateProbability(notSpamWordCount[index], dataLoader.getNumNotSpamTrainingEmails());
             }

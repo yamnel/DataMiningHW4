@@ -17,11 +17,15 @@ class DataLoader {
     private int[] notSpamWordCount;
     private int numSpamTrainingEmails = 0;
     private int numNotSpamTrainingEmails = 0;
+    private boolean filtered = false;
 
-    DataLoader() {
+    DataLoader(boolean filtered) {
         // Print process information
         long startTime = System.nanoTime();
         System.out.print("Loading data files... ");
+
+        // Set whether to filter out symbols
+        this.filtered = filtered;
 
         // Init list to hold all words
         wordList = new ArrayList<>();
@@ -50,8 +54,13 @@ class DataLoader {
                 while ((line = br.readLine()) != null) {
                     for (String word : line.split(" ")) {
                         // If word not in word list, add it
-                        if (wordList.indexOf(word) == -1) {
-                            wordList.add(word);
+                        if (!wordList.contains(word)) {
+                            if(filtered){
+                                word = stripSymbols(word);
+                            }
+                            if(word.length() > 0){
+                                wordList.add(word);
+                            }
                         }
                     }
                 }
@@ -113,6 +122,10 @@ class DataLoader {
             }
         }
         return dataArray;
+    }
+
+    private String stripSymbols(String str){
+        return str.replaceAll("\\W", "");
     }
 
     int[][] getTrainingData() {
