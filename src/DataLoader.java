@@ -55,7 +55,7 @@ class DataLoader {
                     for (String word : line.split(" ")) {
                         // If word not in word list, add it
                         if (!wordList.contains(word)) {
-                            if (!filtered || isAlphaNum(word)) {
+                            if (!(filtered && isSpecialChar(word))) {
                                 wordList.add(word);
                             }
                         }
@@ -125,8 +125,8 @@ class DataLoader {
         return str.replaceAll("\\W", "");
     }
 
-    private boolean isAlphaNum(String str) {
-        return str.matches("^[\\w]+'?[\\w]*:?$");
+    private boolean isSpecialChar(String str) {
+        return str.matches("(^[\\W]+?$)|(^[A-Za-z]$)|(^\\d+$)") || str.length() == 0;
     }
 
     int[][] getTrainingData() {

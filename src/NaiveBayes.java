@@ -22,8 +22,10 @@ class NaiveBayes {
         wordList = dl.getWordList();
         spamWordCount = dl.getSpamWordCount();
         notSpamWordCount = dl.getNotSpamWordCount();
-        m = (double) (sumIntArray(spamWordCount) + sumIntArray(notSpamWordCount)) / (double) trainingData.length;
-        p = 1.0 / (double) wordList.size();
+//        m = (double) (sumIntArray(spamWordCount) + sumIntArray(notSpamWordCount)) / (double) trainingData.length;
+//        p = 1.0 / (double) wordList.size();
+        m = (double)trainingData.length/(double) (sumIntArray(spamWordCount) + sumIntArray(notSpamWordCount));
+        p = 0.1/(double)wordList.size();
         spamClassProbability = mEstimateProbability((double) dataLoader.getNumSpamTrainingEmails(), (double) trainingData.length);
         notSpamClassProbability = mEstimateProbability((double) dataLoader.getNumNotSpamTrainingEmails(), (double) trainingData.length);
 
