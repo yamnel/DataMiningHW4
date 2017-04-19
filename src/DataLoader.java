@@ -126,7 +126,7 @@ class DataLoader {
     }
 
     private boolean isSpecialChar(String str) {
-        return str.matches("(^[\\W]+?$)|(^[A-Za-z]$)|(^\\d+$)") || str.length() == 0;
+        return str.matches("(^[\\W]+?$)|(^[A-Za-z]$)|(^[\\d\\s\\W]+$)") || str.length() == 0;
     }
 
     int[][] getTrainingData() {
