@@ -1,4 +1,4 @@
-# Data Mining
+﻿# Data Mining
 **Assignment #4**
 
 
@@ -11,3 +11,5 @@ Given a data set containing emails that are either regular email or spam;
 3- Pre-process the messages so that you remove symbols and rare words (Less than 50 times).
 
 4- CLEARLY displays accuracy results for each experiment.
+
+All code is contained in the src folder. Run the "Runner" class' main method to execute the program.
