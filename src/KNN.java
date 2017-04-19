@@ -66,6 +66,7 @@ class KNN {
 
         // Find sum of products of elements
         for (int index = 0; index < doc1.length - 1; index++) {
+            // If filtering is turned on, skip words that appear less than 50 times
             if (spamWordCount[index] + notSpamWordCount[index] < 50 && filtered) {
                 continue;
             }
