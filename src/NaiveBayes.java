@@ -58,7 +58,7 @@ class NaiveBayes {
                     wordListFiltered.add(wordList.get(index));
                 }
             }
-            System.out.printf("With filtering, the word list is reduced to %d words.", wordListFiltered.size());
+            System.out.printf("With filtering, the word list is reduced to %d words.\n", wordListFiltered.size());
         }
         return results;
     }
