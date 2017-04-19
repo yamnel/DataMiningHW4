@@ -18,6 +18,14 @@ class KNN {
         System.out.printf("done. Took %d seconds.\n", (System.nanoTime() - startTime) / 1000000000);
     }
 
+
+    /**
+     * Runs KNN
+     *
+     * @param testData Array of integers where each array is the word count for each email
+     * @param n        N for KNN
+     * @return
+     */
     int[] run(int[][] testData, int n) {
         long startTime = System.nanoTime();
         System.out.printf("Running KNN(n=%d) on test data... ", n);
@@ -31,6 +39,7 @@ class KNN {
             results[1]++;
         }
 
+        // Printing out stats
         System.out.printf("done. Took %d seconds.\n",
                 (System.nanoTime() - startTime) / 1000000000);
         System.out.printf("Classified %d records with %.2f%c accuracy.\n",
@@ -40,6 +49,14 @@ class KNN {
         return results;
     }
 
+
+    /**
+     * Get the cosine similarity between two vectors
+     *
+     * @param doc1 First vector to compare
+     * @param doc2 Second vector to compare
+     * @return Similarity where -1 < similarity < 1
+     */
     private double cosSimilarity(int[] doc1, int[] doc2) {
         assert doc1.length == doc2.length;
         double numerator = 0.0;
@@ -66,6 +83,11 @@ class KNN {
         return numerator / denominator;
     }
 
+    /** Get the predicted class for an e-mail
+     * @param testEmail Vector of word counts from an email
+     * @param n N for KNN
+     * @return Integer representing predicted class
+     */
     int getClass(int[] testEmail, int n) {
         double[][] nearestNeighbors = getNearestNeighbors(testEmail, n);
         double cls = 0.0;
@@ -77,6 +99,11 @@ class KNN {
         return (int) Math.round(cls / n);
     }
 
+    /** Get a list of n nearest neighbors using cosine similarity
+     * @param testEmail Vector of word counts
+     * @param n N for KNN
+     * @return Array for Double Arrays with structure { neighbor index, similarity }
+     */
     private double[][] getNearestNeighbors(int[] testEmail, int n) {
         double similarity;
         double[][] result = new double[n][2];
@@ -89,12 +116,16 @@ class KNN {
             similarity = cosSimilarity(testEmail, trainingData[index]);
 
             for (int index2 = 0; index2 < result.length; index2++) {
+                // If this spot in the result array is unfilled, fill it
                 if (result[index2][1] == -1.0) {
                     result[index2][0] = index;
                     result[index2][1] = similarity;
                     break;
                 }
 
+                // Do a sort of insertion sort
+                // Look for the spot where the new similarity is greater than all the others
+                // When found push all the other entries down one and insert this one at the current position
                 if (result[index2][1] < similarity) {
                     double[] temp = {index, similarity};
                     double[] temp2 = new double[2];
@@ -112,14 +143,6 @@ class KNN {
             }
         }
 
-        return result;
-    }
-
-    private double[] getAllDistances(int[][] testData) {
-        double[] result = new double[testData.length];
-        for (int index = 0; index < testData.length; index++) {
-            result[index] = cosSimilarity(trainingData[index], testData[index]);
-        }
         return result;
     }
 }
